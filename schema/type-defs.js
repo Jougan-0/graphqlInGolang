@@ -17,7 +17,21 @@ const typeDefs=gql`
         yearOfPublication:Int!
         isInTheaters:Boolean!
     }
-    
+    input createUserInput{
+        name:String!
+        username:String!
+        age:Int!
+        nationality:Nationality!
+    }
+    input updateUserNameInput{
+        id:ID!
+        username:String!
+    }
+    type Mutation{
+        createUser(input:createUserInput!):User!
+        updateUserName(input:updateUserNameInput!):User!
+        deleteUser(id:ID!):User
+    }
     type Query{
         users:[User!]!
         user(id:ID!):User! #mostly not required to use "!" should be handled in frontend
