@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import {useQuery,gql,useLazyQuery}from"@apollo/client";
+import {useQuery,gql,useLazyQuery, useMutation}from"@apollo/client";
 const QueryAllUser=gql`
     query GetAllUSER{
      users{
@@ -34,13 +34,30 @@ query GetMovieByName($name:String!){
   }
 }
 `
+const CreateUser=gql`
+mutation createUser($input:createUserInput!){
+  createUser(input:$input){
+  name
+  username
+  age
+  nationality
+  } 
+}
 
+`
 
 const DisplayData = () => {
   const [searchedMovie,setSearchedMovie]=useState("");
- const{data,isloading,error}=useQuery(QueryAllUser)
+  
+  
+  const [name,setName]=useState("");
+  const [username,setUserName]=useState("");
+  const [age,setAge]=useState(0);
+  const [nationality,setNationality]=useState("");
+  
+ const{data,isloading,error,refetch}=useQuery(QueryAllUser)
  const{data:movieData}=useQuery(GetAllMovies)
-
+const [createUser]=useMutation(CreateUser)
 const[fetchMovie,{data:movieSearchedData,error:MovieError}]=useLazyQuery(Get_Movie_By_Name);
  if (isloading){
   return <h1>Data is loading ....</h1>
@@ -54,6 +71,24 @@ const[fetchMovie,{data:movieSearchedData,error:MovieError}]=useLazyQuery(Get_Mov
  }
   return (
     <div>
+      <div>
+        <input type='text' placeholder='Name....' onChange={(event)=>{
+          setName(event.target.value)
+        }}/>
+        <input type='text' placeholder='Username....'onChange={(event)=>{
+          setUserName(event.target.value)
+        }}/>
+        <input type='number' placeholder='Age....'onChange={(event)=>{
+          setAge(event.target.value)
+        }}/>
+        <input type='text' placeholder='Nationality ....'onChange={(event)=>{
+          setNationality(event.target.value.toUpperCase())
+        }}/>
+        <button onClick={()=>{
+          createUser({variables:{input:{name,username,age:Number(age),nationality}}})
+          refetch();
+        }}>CreateUser</button>
+      </div>
       {data && data.users.map((user)=>{
         return(
           <div key={user.id}>
